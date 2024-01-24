@@ -263,6 +263,17 @@
                 (find-noncapture-moves! chessboard side file-num rank-num black-pawn-moves output))
             (find-capture-moves! chessboard side file-num rank-num black-pawn-captures output))))
 
+; TODO: castling
+(define white-king-side-castle-empty-squares (list '(5 0) '(6 0)))
+(define white-king-side-castle-safe-squares (list '(4 0) '(5 0) '(6 0)))
+(define white-queen-side-castle-empty-squares (list '(1 0) '(2 0) '(3 0)))
+(define white-queen-side-castle-safe-squares (list '(2 0) '(3 0) '(4 0)))
+
+(define black-king-side-castle-empty-squares (list '(5 7) '(6 7)))
+(define black-king-side-castle-safe-squares (list '(4 7) '(5 7) '(6 7)))
+(define black-queen-side-castle-empty-squares (list '(1 7) '(2 7) '(3 7)))
+(define black-queen-side-castle-safe-squares (list '(2 7) '(3 7) '(4 7)))
+
 (define (find-all-moves! chessboard side output)
     (define linear-idx 0)
 
