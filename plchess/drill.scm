@@ -1,8 +1,25 @@
 (define c (make-chessboard))
 
-(println "is white in check in this position? " (in-check? c 'white))
+(define moves (vector))
 
-; put a black queen on e2 square
-(chessboard-set! c 'e 2 'q)
+(define (display-move move)
+    (define start-x (+ (car move) 1))
+    (define start-y (+ (cadr move) 1))
+    (define end-x (+ (caddr move) 1))
+    (define end-y (+ (cadddr move) 1))
 
-(println "is white in check in this position? " (in-check? c 'white))
+    (define start-file (index->file start-x))
+    (define end-file (index->file end-x))
+
+    (println start-file start-y "-" end-file end-y))
+
+(find-all-moves! c 'white moves)
+
+(println "displaying all valid moves for white")
+(define idx 0)
+(loop
+    (if (>= idx (vector-length moves))
+        (break))
+
+    (display-move (vector-ref moves idx))
+    (set! 'idx (+ idx 1)))

@@ -148,14 +148,156 @@
             (break))
 
         (if (or (= (chessboard-ref-num chessboard file-num rank-num) '())
-                (= (get-piece-side (chessboard-ref-num chessboard file-num rank-num)) side))
+                (!= (get-piece-side (chessboard-ref-num chessboard file-num rank-num)) side))
             (break))
 
         (vector-push! output (list init-file-num init-rank-num file-num rank-num))
 
         ; If the piece is an enemy piece, we can capture it, but we can't move past it.
-        (if (!= null (chessboard-ref-num chessboard file-num rank-num))
+        (if (!= '() (chessboard-ref-num chessboard file-num rank-num))
             (break))
 
         (set! 'file-num (+ file-num dx))
         (set! 'rank-num (+ rank-num dy))))
+
+(define (find-queen-moves! chessboard side file-num rank-num output)
+    (println "finding queen moves")
+    (find-hv-moves! chessboard side file-num rank-num 1 0 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 0 output)
+    (find-hv-moves! chessboard side file-num rank-num 0 1 output)
+    (find-hv-moves! chessboard side file-num rank-num 0 -1 output)
+    (find-hv-moves! chessboard side file-num rank-num 1 1 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 -1 output)
+    (find-hv-moves! chessboard side file-num rank-num 1 -1 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 1 output))
+
+(define (find-rook-moves! chessboard side file-num rank-num output)
+    (println "finding rook moves")
+    (find-hv-moves! chessboard side file-num rank-num 1 0 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 0 output)
+    (find-hv-moves! chessboard side file-num rank-num 0 1 output)
+    (find-hv-moves! chessboard side file-num rank-num 0 -1 output))
+
+(define (find-bishop-moves! chessboard side file-num rank-num output)
+    (println "finding bishop moves")
+    (find-hv-moves! chessboard side file-num rank-num 1 1 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 -1 output)
+    (find-hv-moves! chessboard side file-num rank-num 1 -1 output)
+    (find-hv-moves! chessboard side file-num rank-num -1 1 output))
+
+(define (find-position-moves! chessboard side file-num rank-num positions output)
+    (define new-file-num '())
+    (define new-rank-num '())
+
+    (loop
+        (if (null? positions) (break))
+
+        (set! 'new-file-num (+ file-num (caar positions)))
+        (set! 'new-rank-num (+ rank-num (cadar positions)))
+        (if (and (>= new-file-num 0)
+                 (>= new-rank-num 0)
+                 (< new-file-num 8)
+                 (< new-rank-num 8)
+                 (or (= (chessboard-ref-num chessboard new-file-num new-rank-num) '())
+                     (!= (get-piece-side (chessboard-ref-num chessboard new-file-num new-rank-num)) side)))
+            (vector-push! output (list file-num rank-num new-file-num new-rank-num)))
+
+        (set! 'positions (cdr positions))))
+
+(define (find-knight-moves! chessboard side file-num rank-num output)
+    (println "finding knight moves")
+    (find-position-moves! chessboard side file-num rank-num knight-positions output))
+
+(define (find-king-moves! chessboard side file-num rank-num output)
+    (println "finding king moves")
+    (find-position-moves! chessboard side file-num rank-num king-positions output))
+
+(define second-rank-white-pawn-positions (list '(1 0) '(2 0)))
+(define white-pawn-moves (list '(1 0)))
+(define white-pawn-captures (list '(1 1) '(1 -1)))
+(define seventh-rank-black-pawn-positions (list '(-1 0) '(-2 0)))
+(define black-pawn-moves (list '(-1 0)))
+(define black-pawn-captures (list '(-1 1) '(-1 -1)))
+
+(define (find-capture-moves! chessboard side file-num rank-num positions output)
+    (define new-file-num '())
+    (define new-rank-num '())
+
+    (loop
+        (if (null? positions) (break))
+
+        (set! 'new-file-num (+ file-num (caar positions)))
+        (set! 'new-rank-num (+ rank-num (cadar positions)))
+        (if (and (>= new-file-num 0)
+                 (>= new-rank-num 0)
+                 (< new-file-num 8)
+                 (< new-rank-num 8)
+                 (not (= (chessboard-ref-num chessboard new-file-num new-rank-num) '()))
+                 (not (= (get-piece-side (chessboard-ref-num chessboard new-file-num new-rank-num)) side)))
+            (vector-push! output (list file-num rank-num new-file-num new-rank-num)))
+        (set! 'positions (cdr positions))))
+
+(define (find-noncapture-moves! chessboard side file-num rank-num positions output)
+    (define new-file-num '())
+    (define new-rank-num '())
+
+    (loop
+        (if (null? positions) (break))
+
+        (set! 'new-file-num (+ file-num (caar positions)))
+        (set! 'new-rank-num (+ rank-num (cadar positions)))
+        (if (and (>= new-file-num 0)
+                 (>= new-rank-num 0)
+                 (< new-file-num 8)
+                 (< new-rank-num 8)
+                 (= (chessboard-ref-num chessboard new-file-num new-rank-num) '()))
+            (vector-push! output (list file-num rank-num new-file-num new-rank-num)))
+        (set! 'positions (cdr positions))))
+
+(define (find-pawn-moves! chessboard side file-num rank-num output)
+    (println "finding pawn moves")
+    (if (= side 'white)
+        (begin
+            (if (= rank-num 1)
+                (find-noncapture-moves! chessboard side file-num rank-num second-rank-white-pawn-positions output)
+                (find-noncapture-moves! chessboard side file-num rank-num white-pawn-moves output))
+            (find-capture-moves! chessboard side file-num rank-num white-pawn-captures output))
+        (begin
+            (if (= rank-num 6)
+                (find-noncapture-moves! chessboard side file-num rank-num seventh-rank-black-pawn-positions output)
+                (find-noncapture-moves! chessboard side file-num rank-num black-pawn-moves output))
+            (find-capture-moves! chessboard side file-num rank-num black-pawn-captures output))))
+
+(define (find-all-moves! chessboard side output)
+    (define linear-idx 0)
+
+    (define file-num '())
+    (define rank-num '())
+    (define piece '())
+
+    (loop
+        (if (> linear-idx 63) (break))
+
+        (set! 'file-num (% linear-idx 8))
+        (set! 'rank-num (/ linear-idx 8))
+        (set! 'piece (chessboard-ref-num chessboard file-num rank-num))
+
+        (println "file-num=" file-num " rank-num=" rank-num " piece=" piece)
+
+        (if (and (not (= piece '()))
+                 (= (get-piece-side piece) side))
+            (cond [(= piece (get-side-piece 'q side))
+                   (find-queen-moves! chessboard side file-num rank-num output)]
+                  [(= piece (get-side-piece 'r side))
+                   (find-rook-moves! chessboard side file-num rank-num output)]
+                  [(= piece (get-side-piece 'b side))
+                   (find-bishop-moves! chessboard side file-num rank-num output)]
+                  [(= piece (get-side-piece 'n side))
+                   (find-knight-moves! chessboard side file-num rank-num output)]
+                  [(= piece (get-side-piece 'k side))
+                   (find-king-moves! chessboard side file-num rank-num output)]
+                  [(= piece (get-side-piece 'p side))
+                   (find-pawn-moves! chessboard side file-num rank-num output)]
+                  [else (error "Unknown piece type")]))
+
+        (set! 'linear-idx (+ linear-idx 1))))

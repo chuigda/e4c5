@@ -30,6 +30,17 @@
           [(= file 'h) 8]
           [else (error "unknown chessboard file: " file)]))
 
+(define (index->file index)
+    (cond [(= index 1) 'a]
+          [(= index 2) 'b]
+          [(= index 3) 'c]
+          [(= index 4) 'd]
+          [(= index 5) 'e]
+          [(= index 6) 'f]
+          [(= index 7) 'g]
+          [(= index 8) 'h]
+          [else (error "unknown chessboard file index: " index)]))
+
 (define (cartesian->linear file rank)
     (define file-num (- (file->index file) 1))
     (define rank-num (- rank 1))
