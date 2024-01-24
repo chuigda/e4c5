@@ -142,6 +142,7 @@
 
     (set! 'file-num (+ file-num dx))
     (set! 'rank-num (+ rank-num dy))
+    (define piece '())
 
     (loop
         (if (or (>= file-num 8)
@@ -150,8 +151,9 @@
                 (< rank-num 0))
             (break))
 
-        (if (or (= (chessboard-ref-num chessboard file-num rank-num) '())
-                (= (get-piece-side (chessboard-ref-num chessboard file-num rank-num)) side))
+        (set! 'piece (chessboard-ref-num chessboard file-num rank-num))
+        (if (and (!= piece '())
+                 (= (get-piece-side piece) side))
             (break))
 
         (vector-push! output (list init-file-num init-rank-num file-num rank-num))
