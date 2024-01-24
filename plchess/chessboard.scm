@@ -95,3 +95,36 @@
     (cond [(= side 'white) 'black]
           [(= side 'black) 'white]
           [else (error "unknown side: " side)]))
+
+(define (piece-glyph piece)
+    (cond [(= piece 'P) "♙ "]
+          [(= piece 'N) "♘ "]
+          [(= piece 'B) "♗ "]
+          [(= piece 'R) "♖ "]
+          [(= piece 'Q) "♕ "]
+          [(= piece 'K) "♔ "]
+          [(= piece 'p) "♟ "]
+          [(= piece 'n) "♞ "]
+          [(= piece 'b) "♝ "]
+          [(= piece 'r) "♜ "]
+          [(= piece 'q) "♛ "]
+          [(= piece 'k) "♚ "]
+          [(= piece '()) "  "]
+          [else (error "unknown piece: " piece)]))
+
+(define (print-chessboard chessboard)
+    (define rank-num 7)
+    (define file-num 0)
+
+    (loop
+        (if (< rank-num 0)
+            (break))
+        (loop
+            (if (= file-num 8)
+                (break))
+            (print (piece-glyph (chessboard-ref-num chessboard file-num rank-num)))
+            (set! 'file-num (+ file-num 1)))
+
+        (println "")
+        (set! 'rank-num (- rank-num 1))
+        (set! 'file-num 0)))

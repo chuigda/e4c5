@@ -13,6 +13,7 @@
 
 (define moves (find-valid-moves c 'white))
 
+(print-chessboard c)
 (println "displaying all valid moves for white")
 (define idx 0)
 (loop
@@ -26,6 +27,7 @@
 (apply-move! c (list 4 1 4 3))
 (apply-move! c (list 4 6 4 4))
 
+(print-chessboard c)
 (println "displaying all valid moves for white")
 (set! 'moves (find-valid-moves c 'white))
 (set! 'idx 0)
