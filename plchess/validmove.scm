@@ -121,16 +121,19 @@
 
     (under-attack? chessboard king-file king-rank side))
 
-(define (apply-move chessboard move)
+(define (apply-move! chessboard move)
     (define start-file (car move))
     (define start-rank (cadr move))
     (define end-file (caddr move))
     (define end-rank (cadddr move))
 
     (define piece (chessboard-ref-num chessboard start-file start-rank))
+    (chessboard-set-num! chessboard start-file start-rank '())
+    (chessboard-set-num! chessboard end-file end-rank piece))
+
+(define (apply-move chessboard move)
     (define new-chessboard (chessboard-dup chessboard))
-    (chessboard-set-num! new-chessboard start-file start-rank '())
-    (chessboard-set-num! new-chessboard end-file end-rank piece)
+    (apply-move! new-chessboard move)
     new-chessboard)
 
 (define (find-hv-moves! chessboard side file-num rank-num dx dy output)
@@ -305,3 +308,22 @@
                   [else (error "Unknown piece type")]))
 
         (set! 'linear-idx (+ linear-idx 1))))
+
+(define (find-valid-moves chessboard side)
+    (define all-output (vector))
+    (define filtered-output (vector))
+
+    (find-all-moves! chessboard side all-output)
+
+    (define idx 0)
+    (define new-chessboard '())
+    (loop
+        (if (>= idx (vector-length all-output)) (break))
+
+        (set! 'new-chessboard (apply-move chessboard (vector-ref all-output idx)))
+        (if (not (in-check? new-chessboard side))
+            (vector-push! filtered-output (vector-ref all-output idx)))
+
+        (set! 'idx (+ idx 1)))
+
+    filtered-output)
