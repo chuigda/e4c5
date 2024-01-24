@@ -54,7 +54,7 @@
     (define linear-index (cartesian->linear file rank))
     (vector-set! (get-field chessboard 'position) linear-index piece))
 
-(define (get-piece piece side)
+(define (get-side-piece piece side)
     (cond [(= side 'white)
            (cond [(= piece 'p) 'P]
                  [(= piece 'n) 'N]
@@ -64,6 +64,21 @@
                  [(= piece 'k) 'K]
                  [else (error "unknown piece: " piece)])]
           [(= side 'black) piece]))
+
+(define (get-piece-side piece)
+    (cond [(= piece 'P) 'white]
+          [(= piece 'N) 'white]
+          [(= piece 'B) 'white]
+          [(= piece 'R) 'white]
+          [(= piece 'Q) 'white]
+          [(= piece 'K) 'white]
+          [(= piece 'p) 'black]
+          [(= piece 'n) 'black]
+          [(= piece 'b) 'black]
+          [(= piece 'r) 'black]
+          [(= piece 'q) 'black]
+          [(= piece 'k) 'black]
+          [else (error "unknown piece: " piece)]))
 
 (define (opponent-side side)
     (cond [(= side 'white) 'black]

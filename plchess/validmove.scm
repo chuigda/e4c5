@@ -38,7 +38,7 @@
 
 (define (under-attack-queen? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-queen (get-piece 'q opponent))
+    (define opponent-queen (get-side-piece 'q opponent))
 
     (or (find-piece chessboard file-num rank-num 1 0 opponent-queen)
         (find-piece chessboard file-num rank-num -1 0 opponent-queen)
@@ -51,7 +51,7 @@
 
 (define (under-attack-rook? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-king (get-piece 'r opponent))
+    (define opponent-king (get-side-piece 'r opponent))
 
     (or (find-piece chessboard file-num rank-num 1 0 opponent-king)
         (find-piece chessboard file-num rank-num -1 0 opponent-king)
@@ -60,7 +60,7 @@
 
 (define (under-attack-bishop? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-king (get-piece 'b opponent))
+    (define opponent-king (get-side-piece 'b opponent))
 
     (or (find-piece chessboard file-num rank-num 1 1 opponent-king)
         (find-piece chessboard file-num rank-num -1 -1 opponent-king)
@@ -72,7 +72,7 @@
 
 (define (under-attack-knight? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-knight (get-piece 'n opponent))
+    (define opponent-knight (get-side-piece 'n opponent))
 
     (find-piece-positions chessboard file-num rank-num knight-positions opponent-knight))
 
@@ -81,7 +81,7 @@
 
 (define (under-attack-king? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-king (get-piece 'k opponent))
+    (define opponent-king (get-side-piece 'k opponent))
 
     (find-piece-positions chessboard file-num rank-num king-positions opponent-king))
 
@@ -90,7 +90,7 @@
 
 (define (under-attack-pawn? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
-    (define opponent-pawn (get-piece 'p opponent))
+    (define opponent-pawn (get-side-piece 'p opponent))
 
     (if (= side 'white)
         (find-piece-positions chessboard file-num rank-num black-pawn-attack-positions opponent-pawn)
@@ -105,7 +105,7 @@
         (under-attack-pawn? chessboard file-num rank-num side)))
 
 (define (find-king chessboard side)
-    (define king (get-piece 'k side))
+    (define king (get-side-piece 'k side))
     (define linear-index 0)
 
     (loop
@@ -120,3 +120,42 @@
     (define king-rank (/ king-index 8))
 
     (under-attack? chessboard king-file king-rank side))
+
+(define (apply-move chessboard move)
+    (define start-file (car move))
+    (define start-rank (cadr move))
+    (define end-file (caddr move))
+    (define end-rank (cadddr move))
+
+    (define piece (chessboard-ref-num chessboard start-file start-rank))
+    (define new-chessboard (chessboard-dup chessboard))
+    (chessboard-set-num! new-chessboard start-file start-rank '())
+    (chessboard-set-num! new-chessboard end-file end-rank piece)
+    new-chessboard)
+
+(define (find-hv-moves! chessboard side file-num rank-num dx dy output)
+    (define init-file-num file-num)
+    (define init-rank-num rank-num)
+
+    (set! 'file-num (+ file-num dx))
+    (set! 'rank-num (+ rank-num dy))
+
+    (loop
+        (if (or (>= file-num 8)
+                (>= rank-num 8)
+                (< file-num 0)
+                (< rank-num 0))
+            (break))
+
+        (if (or (= (chessboard-ref-num chessboard file-num rank-num) '())
+                (= (get-piece-side (chessboard-ref-num chessboard file-num rank-num)) side))
+            (break))
+
+        (vector-push! output (list init-file-num init-rank-num file-num rank-num))
+
+        ; If the piece is an enemy piece, we can capture it, but we can't move past it.
+        (if (!= null (chessboard-ref-num chessboard file-num rank-num))
+            (break))
+
+        (set! 'file-num (+ file-num dx))
+        (set! 'rank-num (+ rank-num dy))))

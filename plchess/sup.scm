@@ -15,3 +15,5 @@
 (define (cdadr x) (cdr (car (cdr x))))
 (define (cddar x) (cdr (cdr (car x))))
 (define (cdddr x) (cdr (cdr (cdr x))))
+
+(define (cadddr x) (car (cdr (cdr (cdr x)))))
