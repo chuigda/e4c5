@@ -1,4 +1,7 @@
 (define (find-piece chessboard file-num rank-num dx dy piece)
+    (set! 'file-num (+ file-num dx))
+    (set! 'rank-num (+ rank-num dy))
+
     (loop
         (if (or (>= file-num 8)
                 (>= rank-num 8)
@@ -94,13 +97,6 @@
         (find-piece-positions chessboard file-num rank-num white-pawn-attack-positions opponent-pawn)))
 
 (define (under-attack? chessboard file-num rank-num side)
-    ; (println "square " file-num "-" rank-num " under attack of queen? " (under-attack-queen? chessboard file-num rank-num side))
-    ; (println "square " file-num "-" rank-num " under attack of rook? " (under-attack-rook? chessboard file-num rank-num side))
-    ; (println "square " file-num "-" rank-num " under attack of bishop? " (under-attack-bishop? chessboard file-num rank-num side))
-    ; (println "square " file-num "-" rank-num " under attack of knight? " (under-attack-knight? chessboard file-num rank-num side))
-    ; (println "square " file-num "-" rank-num " under attack of king? " (under-attack-king? chessboard file-num rank-num side))
-    ; (println "square " file-num "-" rank-num " under attack of pawn? " (under-attack-pawn? chessboard file-num rank-num side))
-
     (or (under-attack-queen? chessboard file-num rank-num side)
         (under-attack-rook? chessboard file-num rank-num side)
         (under-attack-bishop? chessboard file-num rank-num side)
@@ -120,7 +116,7 @@
 
 (define (in-check? chessboard side)
     (define king-index (find-king chessboard side))
-    (define king-file (/ king-index 8))
-    (define king-rank (% king-index 8))
+    (define king-file (% king-index 8))
+    (define king-rank (/ king-index 8))
 
     (under-attack? chessboard king-file king-rank side))

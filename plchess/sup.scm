@@ -1,5 +1,5 @@
 (define (<= x y) (or (< x y) (= x y)))
-(define (> x y) (<= y x))
+(define (> x y) (< y x))
 (define (>= x y) (or (> x y) (= x y)))
 (define (!= x y) (not (= x y)))
 
