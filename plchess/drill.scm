@@ -37,3 +37,23 @@
 
     (display-move (vector-ref moves idx))
     (set! 'idx (+ idx 1)))
+
+(println "now play 2. Qh5? Nc6")
+(apply-move! c (list 3 0 7 4))
+(apply-move! c (list 1 7 2 5))
+(print-chessboard c)
+
+(println "now play 3. Bc4 Nf6??")
+(apply-move! c (list 5 0 2 3))
+(apply-move! c (list 6 7 5 5))
+(print-chessboard c)
+
+(println "now play 4. Qxf7#")
+(apply-move! c (list 7 4 5 6))
+(print-chessboard c)
+
+(set! 'moves (find-valid-moves c 'black))
+
+(println "now there should be no valid moves for black, and the king is in checkmate")
+(assert (= (vector-length moves) 0)
+        "there should be no valid moves for black")
