@@ -57,3 +57,5 @@
 (println "now there should be no valid moves for black, and the king is in checkmate")
 (assert (= (vector-length moves) 0)
         "there should be no valid moves for black")
+(assert (in-check? c 'black)
+        "black should be in check")
