@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+pl5 sup.scm chessboard.scm validmove.scm --repl

@@ -43,6 +43,9 @@
     (define linear-index (cartesian->linear file rank))
     (vector-ref (get-field chessboard 'position) linear-index))
 
+(define (chessboard-ref-linear chessboard linear-index)
+    (vector-ref (get-field chessboard 'position) linear-index))
+
 (define (chessboard-set-num! chessboard file-num rank-num piece)
     (define linear-index (+ (* rank-num 8) file-num))
     (vector-set! (get-field chessboard 'position) linear-index piece))

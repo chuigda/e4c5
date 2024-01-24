@@ -1,7 +1,4 @@
-(define (find-piece chessboard file rank dx dy piece)
-    (define file-num (- (file->index file) 1))
-    (define rank-num (- (rank->index rank) 1))
-
+(define (find-piece chessboard file-num rank-num dx dy piece)
     (loop
         (if (or (>= file-num 8)
                 (>= rank-num 8)
@@ -9,16 +6,16 @@
                 (< rank-num 0))
             (break false))
 
-        (if (eq? (chessboard-ref-num chessboard file rank) piece)
+        (if (= (chessboard-ref-num chessboard file-num rank-num) piece)
             (break true))
+
+        (if (!= (chessboard-ref-num chessboard file-num rank-num) '())
+            (break false))
 
         (set! 'file-num (+ file-num dx))
         (set! 'rank-num (+ rank-num dy))))
 
-(define (find-piece-positions chessboard file rank positions piece)
-    (define file-num (- (file->index file) 1))
-    (define rank-num (- (rank->index rank) 1))
-
+(define (find-piece-positions chessboard file-num rank-num positions piece)
     (define new-file-num '())
     (define new-rank-num '())
 
@@ -31,75 +28,99 @@
                  (>= new-rank-num 0)
                  (< new-file-num 8)
                  (< new-rank-num 8)
-                 (eq? (chessboard-ref-num chessboard file rank) piece))
+                 (= (chessboard-ref-num chessboard new-file-num new-rank-num) piece))
             (break true))
 
         (set! 'positions (cdr positions))))
 
-(define (under-attack-queen? chessboard file rank side)
+(define (under-attack-queen? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-queen (get-piece 'q opponent))
 
-    (or (find-piece chessboard file rank 1 0 opponent-queen)
-        (find-piece chessboard file rank -1 0 opponent-queen)
-        (find-piece chessboard file rank 0 1 opponent-queen)
-        (find-piece chessboard file rank 0 -1 opponent-queen)
-        (find-piece chessboard file rank 1 1 opponent-queen)
-        (find-piece chessboard file rank -1 -1 opponent-queen)
-        (find-piece chessboard file rank 1 -1 opponent-queen)
-        (find-piece chessboard file rank -1 1 opponent-queen)))
+    (or (find-piece chessboard file-num rank-num 1 0 opponent-queen)
+        (find-piece chessboard file-num rank-num -1 0 opponent-queen)
+        (find-piece chessboard file-num rank-num 0 1 opponent-queen)
+        (find-piece chessboard file-num rank-num 0 -1 opponent-queen)
+        (find-piece chessboard file-num rank-num 1 1 opponent-queen)
+        (find-piece chessboard file-num rank-num -1 -1 opponent-queen)
+        (find-piece chessboard file-num rank-num 1 -1 opponent-queen)
+        (find-piece chessboard file-num rank-num -1 1 opponent-queen)))
 
-(define (under-attack-rook? chessboard file rank side)
+(define (under-attack-rook? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-king (get-piece 'r opponent))
 
-    (or (find-piece chessboard file rank 1 0 opponent-king)
-        (find-piece chessboard file rank -1 0 opponent-king)
-        (find-piece chessboard file rank 0 1 opponent-king)
-        (find-piece chessboard file rank 0 -1 opponent-king)))
+    (or (find-piece chessboard file-num rank-num 1 0 opponent-king)
+        (find-piece chessboard file-num rank-num -1 0 opponent-king)
+        (find-piece chessboard file-num rank-num 0 1 opponent-king)
+        (find-piece chessboard file-num rank-num 0 -1 opponent-king)))
 
-(define (under-attack-bishop? chessboard file rank side)
+(define (under-attack-bishop? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-king (get-piece 'b opponent))
 
-    (or (find-piece chessboard file rank 1 1 opponent-king)
-        (find-piece chessboard file rank -1 -1 opponent-king)
-        (find-piece chessboard file rank 1 -1 opponent-king)
-        (find-piece chessboard file rank -1 1 opponent-king)))
+    (or (find-piece chessboard file-num rank-num 1 1 opponent-king)
+        (find-piece chessboard file-num rank-num -1 -1 opponent-king)
+        (find-piece chessboard file-num rank-num 1 -1 opponent-king)
+        (find-piece chessboard file-num rank-num -1 1 opponent-king)))
 
 (define knight-positions (list '(2 1) '(2 -1) '(-2 1) '(-2 -1)
                                '(1 2) '(1 -2) '(-1 2) '(-1 -2)))
 
-(define (under-attack-knight? chessbaord file rank side)
+(define (under-attack-knight? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-knight (get-piece 'n opponent))
 
-    (find-piece-positions chessboard file rank knight-positions opponent-knight))
+    (find-piece-positions chessboard file-num rank-num knight-positions opponent-knight))
 
 (define king-positions (list '(1 0) '(-1 0) '(0 1) '(0 -1)
                              '(1 1) '(-1 -1) '(1 -1) '(-1 1)))
 
-(define (under-attack-king? chessboard file rank side)
+(define (under-attack-king? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-king (get-piece 'k opponent))
 
-    (find-piece-positions chessboard file rank king-positions opponent-king))
+    (find-piece-positions chessboard file-num rank-num king-positions opponent-king))
 
 (define white-pawn-attack-positions (list '(1 1) '(1 -1)))
 (define black-pawn-attack-positions (list '(-1 1) '(-1 -1)))
 
-(define (under-attack-pawn? chessboard file rank side)
+(define (under-attack-pawn? chessboard file-num rank-num side)
     (define opponent (opponent-side side))
     (define opponent-pawn (get-piece 'p opponent))
 
-    (if (eq? side 'white)
-        (find-piece-positions chessboard file rank black-pawn-attack-positions opponent-pawn)
-        (find-piece-positions chessboard file rank white-pawn-attack-positions opponent-pawn)))
+    (if (= side 'white)
+        (find-piece-positions chessboard file-num rank-num black-pawn-attack-positions opponent-pawn)
+        (find-piece-positions chessboard file-num rank-num white-pawn-attack-positions opponent-pawn)))
 
-(define (under-attack? chessboard file rank side)
-    (or (under-attack-queen? chessboard file rank side)
-        (under-attack-rook? chessboard file rank side)
-        (under-attack-bishop? chessboard file rank side)
-        (under-attack-knight? chessboard file rank side)
-        (under-attack-king? chessboard file rank side)
-        (under-attack-pawn? chessboard file rank side)))
+(define (under-attack? chessboard file-num rank-num side)
+    ; (println "square " file-num "-" rank-num " under attack of queen? " (under-attack-queen? chessboard file-num rank-num side))
+    ; (println "square " file-num "-" rank-num " under attack of rook? " (under-attack-rook? chessboard file-num rank-num side))
+    ; (println "square " file-num "-" rank-num " under attack of bishop? " (under-attack-bishop? chessboard file-num rank-num side))
+    ; (println "square " file-num "-" rank-num " under attack of knight? " (under-attack-knight? chessboard file-num rank-num side))
+    ; (println "square " file-num "-" rank-num " under attack of king? " (under-attack-king? chessboard file-num rank-num side))
+    ; (println "square " file-num "-" rank-num " under attack of pawn? " (under-attack-pawn? chessboard file-num rank-num side))
+
+    (or (under-attack-queen? chessboard file-num rank-num side)
+        (under-attack-rook? chessboard file-num rank-num side)
+        (under-attack-bishop? chessboard file-num rank-num side)
+        (under-attack-knight? chessboard file-num rank-num side)
+        (under-attack-king? chessboard file-num rank-num side)
+        (under-attack-pawn? chessboard file-num rank-num side)))
+
+(define (find-king chessboard side)
+    (define king (get-piece 'k side))
+    (define linear-index 0)
+
+    (loop
+        (if (> linear-index 63) (break false))
+        (if (= (chessboard-ref-linear chessboard linear-index) king)
+            (break linear-index))
+        (set! 'linear-index (+ linear-index 1))))
+
+(define (in-check? chessboard side)
+    (define king-index (find-king chessboard side))
+    (define king-file (/ king-index 8))
+    (define king-rank (% king-index 8))
+
+    (under-attack? chessboard king-file king-rank side))
