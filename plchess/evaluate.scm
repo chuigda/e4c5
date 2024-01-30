@@ -9,14 +9,14 @@
 ; knights worth more in the center, and most times it's less
 ; valuable than a bishop
 (define position-value-knight
-    (vector 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5
+    (vector 0.3 0.5 0.5 0.5 0.5 0.5 0.5 0.3
             0.5 0.7 0.9 0.9 0.9 0.9 0.7 0.5
             0.5 0.9 1.0 1.1 1.1 1.0 0.9 0.5
             0.5 0.9 1.1 1.1 1.1 1.1 0.9 0.5
             0.5 0.9 1.1 1.1 1.1 1.1 0.9 0.5
             0.5 0.9 1.0 1.1 1.1 1.0 0.9 0.5
             0.5 0.7 0.9 0.9 0.9 0.9 0.7 0.5
-            0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5))
+            0.3 0.5 0.5 0.5 0.5 0.5 0.5 0.3))
 
 ; pawns worth more as they advance, and this also encourages
 ; them to move forward, also encourages king's pawn and queen's
